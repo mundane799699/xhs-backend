@@ -48,7 +48,7 @@
         </foreach>
         ON DUPLICATE KEY UPDATE
         display_title=VALUES(display_title),
-        xsec_token=VALUSE(xsec_token),
+        xsec_token=VALUES(xsec_token),
         cover_url=VALUES(cover_url),
         owner_nickname=VALUES(owner_nickname),
         owner_avatar=VALUES(owner_avatar),

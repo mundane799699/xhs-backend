@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class RedBookCollectDto {
     private String userId;
     private String noteId;
+    private String xsecToken;
     private String displayTitle;
     private String type;
     private String coverUrl;

@@ -155,7 +155,8 @@ public class RedBookCollectService {
             cell0.setCellValue(note.getDisplayTitle());
 
             XSSFCell cell1 = row.createCell(1);
-            String noteAddress = "https://www.xiaohongshu.com/explore/" + note.getNoteId();
+            // https://www.xiaohongshu.com/explore/${noteId}?xsec_token=${record.xsecToken}&xsec_source=pc_collect
+            String noteAddress = "https://www.xiaohongshu.com/explore/" + note.getNoteId() + "?xsec_token=" + note.getXsecToken() + "&xsec_source=pc_collect";
             Hyperlink noteLink = createHelper.createHyperlink(HyperlinkType.URL);
             noteLink.setAddress(noteAddress);
             cell1.setHyperlink(noteLink);
