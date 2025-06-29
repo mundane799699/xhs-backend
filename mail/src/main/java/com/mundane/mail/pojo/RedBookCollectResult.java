@@ -50,6 +50,7 @@ public class RedBookCollectResult {
              */
 
             private String noteId;
+            private String xsecToken;
             private String displayTitle;
             private String type;
             private CoverBean cover;

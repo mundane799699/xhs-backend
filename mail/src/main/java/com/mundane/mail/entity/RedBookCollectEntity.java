@@ -10,6 +10,7 @@ import java.util.Date;
 public class RedBookCollectEntity {
     private String userId;
     private String noteId;
+    private String xsecToken;
     private String displayTitle;
     private String type;
     private String coverUrl;

@@ -87,6 +87,7 @@ public class RedBookCollectService {
             RedBookCollectEntity entity = new RedBookCollectEntity();
             entity.setUserId(request.getUserId());
             entity.setNoteId(note.getNoteId());
+            entity.setXsecToken(note.getXsecToken());
             entity.setDisplayTitle(note.getDisplayTitle());
             entity.setType(note.getType());
             entity.setCollectIndex(i);
