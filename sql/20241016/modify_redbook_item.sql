@@ -1,0 +1,1 @@
+ALTER TABLE tb_redbook_item ADD COLUMN `membership_type` varchar(20) DEFAULT 'FREE' COMMENT '会员类型（FREE, MONTHLY, YEARLY, LIFETIME, TRIAL）';

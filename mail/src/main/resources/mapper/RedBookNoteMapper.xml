@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mundane.mail.mapper.RedBookNoteMapper">
+
+    <insert id="addOrUpdate" parameterType="com.mundane.mail.entity.RedBookNoteEntity">
+        insert into
+            tb_redbook_note(
+        note_id,
+        author_id,
+        author_name,
+        title,
+        `type`,
+        note_desc,
+        tags,
+        liked_count,
+        collected_count,
+        comment_count,
+        create_time,
+        update_time,
+        pic_path_list,
+        status
+        )
+        values
+        (#{noteId},
+        #{authorId},
+        #{authorName},
+        #{title},
+        #{type},
+        #{noteDesc},
+        #{tags},
+        #{likedCount},
+        #{collectedCount},
+        #{commentCount},
+        now(),
+        now(),
+        #{picPathList},
+        #{status})
+        ON DUPLICATE KEY UPDATE
+        author_name=#{authorName},
+        title=#{title},
+        note_desc=#{noteDesc},
+        tags=#{tags},
+        liked_count=#{likedCount},
+        collected_count=#{collectedCount},
+        comment_count=#{commentCount},
+        pic_path_list=#{picPathList},
+        update_time=now()
+    </insert>
+
+    <select id="selectPicPath" resultType="com.mundane.mail.entity.RedBookNoteEntity">
+        select * from tb_redbook_note where pic_path_list is not null
+    </select>
+
+    <update id="updatePicPath" parameterType="com.mundane.mail.entity.RedBookNoteEntity">
+        update tb_redbook_note
+        set pic_path_list=#{picPathList}
+        where note_id=#{noteId}
+    </update>
+
+</mapper>

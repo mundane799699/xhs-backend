@@ -1,0 +1,1 @@
+ALTER TABLE tb_redbook_order ADD COLUMN user_id_new bigint(20) DEFAULT NULL COMMENT '新的用户唯一标识' AFTER user_id;

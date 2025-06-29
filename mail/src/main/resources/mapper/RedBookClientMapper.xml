@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mundane.mail.mapper.RedBookClientMapper">
+
+    <select id="selectByClientId" resultType="com.mundane.mail.entity.RedBookClientEntity">
+        select
+            *
+        from
+            tb_redbook_client
+        <where>
+            status = 1
+            <choose>
+                <when test="clientId != null and clientId != '' and userId != null and userId != ''">
+                    and (client_id = #{clientId} or id = #{userId})
+                </when>
+                <when test="clientId != null and clientId != ''">
+                    and client_id = #{clientId}
+                </when>
+                <when test="userId != null and userId != ''">
+                    and id = #{userId}
+                </when>
+            </choose>
+        </where>
+    </select>
+
+
+    <select id="selectByOutTradeNo" resultType="com.mundane.mail.entity.RedBookClientEntity">
+        select
+            *
+        from
+            tb_redbook_client
+        <where>
+            <if test="outTradeNo != null and outTradeNo != ''">
+                and out_trade_no = #{outTradeNo}
+            </if>
+        </where>
+    </select>
+
+
+
+</mapper>

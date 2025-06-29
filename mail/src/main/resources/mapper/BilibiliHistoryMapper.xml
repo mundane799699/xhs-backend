@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mundane.mail.mapper.BilibiliHistoryMapper">
+
+    <insert id="batchAddOrUpdate" parameterType="java.util.List">
+        insert into tb_bilibili_history(
+        user_id,
+        bvid,
+        title,
+        cover,
+        author_name,
+        author_mid,
+        progress,
+        is_finish,
+        is_fav,
+        videos,
+        live_status,
+        tag_name,
+        view_at,
+        create_time,
+        update_time)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.userId},
+            #{item.bvid},
+            #{item.title},
+            #{item.cover},
+            #{item.authorName},
+            #{item.authorMid},
+            #{item.progress},
+            #{item.isFinish},
+            #{item.isFav},
+            #{item.videos},
+            #{item.liveStatus},
+            #{item.tagName},
+            #{item.viewAt},
+            now(),
+            now()
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        view_at=values(view_at),
+        progress=values(progress),
+        is_finish=values(is_finish),
+        is_fav=values(is_fav),
+        update_time=now()
+    </insert>
+
+    <select id="queryByUserId" resultType="com.mundane.mail.entity.BilibiliHistoryEntity">
+        SELECT
+            user_id,
+            bvid,
+            title,
+            cover,
+            author_name,
+            author_mid,
+            progress,
+            is_finish,
+            is_fav,
+            videos,
+            live_status,
+            tag_name,
+            view_at,
+            create_time,
+            update_time
+        FROM
+            tb_bilibili_history
+        <where>
+            user_id = #{userId}
+            <if test="title != null and title != ''">
+                and title like concat('%', #{title}, '%')
+            </if>
+            <if test="authorName != null and authorName != ''">
+                and author_name like concat('%', #{authorName}, '%')
+            </if>
+        </where>
+        order by
+            view_at desc
+    </select>
+
+
+</mapper>

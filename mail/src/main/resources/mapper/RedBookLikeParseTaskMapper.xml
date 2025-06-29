@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mundane.mail.mapper.RedBookLikeParseTaskMapper">
+
+    <insert id="addOrUpdate" parameterType="com.mundane.mail.entity.RedBookLikeParseTaskEntity">
+        insert into
+            tb_redbook_like_parse_task
+        (
+            user_id,
+            status,
+            progress,
+            create_time,
+            update_time
+        )
+        values(
+            #{userId},
+            #{status},
+            #{progress},
+            now(),
+            now()
+        ) ON DUPLICATE KEY UPDATE
+        status=VALUES(status),
+        progress=VALUES(progress),
+        update_time=now()
+    </insert>
+</mapper>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mundane.mail.mapper.RedBookNoteImgMapper">
+
+    <insert id="batchAddOrUpdate" parameterType="java.util.List">
+        insert into tb_redbook_note_img(
+        file_id,
+        note_id,
+        url,
+        img_index,
+        height,
+        width,
+        create_time,
+        update_time)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.fileId},
+            #{item.noteId},
+            #{item.url},
+            #{item.imgIndex},
+            #{item.height},
+            #{item.width},
+            now(),
+            now()
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        img_index=VALUES(img_index),
+        update_time=now()
+    </insert>
+
+    <select id="selectByNoteId" resultType="com.mundane.mail.entity.RedBookNoteImgEntity">
+        select
+            *
+        from
+            tb_redbook_note_img
+        where
+            note_id = #{noteId}
+        order by img_index asc
+    </select>
+
+    <delete id="deleteByNoteId" >
+        delete from tb_redbook_note_img
+        <where>
+            note_id = #{noteId}
+        </where>
+    </delete>
+
+</mapper>
