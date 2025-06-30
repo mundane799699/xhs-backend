@@ -18,7 +18,7 @@ public class RedBookCollectDto {
     private String ownerNickname;
     private String ownerAvatar;
     private Boolean liked;
-    private Integer likedCount;
+    private String likedCount;
 
     private String tagList;
     private String detailId;

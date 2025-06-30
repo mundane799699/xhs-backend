@@ -67,7 +67,6 @@ public class RedBookLikeService {
     private RedBookNoteImgService redBookNoteImgService;
 
 
-    
     public void save(RedBookLikeRequest request) {
         RedBookCollectResult result = JSONUtil.toBean(request.getResult(), RedBookCollectResult.class);
         List<RedBookCollectResult.DataBean.NotesBean> notes = result.getData().getNotes();
@@ -76,10 +75,11 @@ public class RedBookLikeService {
             RedBookLikeEntity entity = new RedBookLikeEntity();
             entity.setUserId(request.getUserId());
             entity.setNoteId(note.getNoteId());
+            entity.setXsecToken(note.getXsecToken());
             entity.setDisplayTitle(note.getDisplayTitle());
             entity.setType(note.getType());
             List<RedBookCollectResult.DataBean.NotesBean.CoverBean.ImageInfo> infoList = note.getCover().getInfoList();
-            entity.setCoverUrl(infoList.get(infoList.size()-1).getUrl());
+            entity.setCoverUrl(infoList.get(infoList.size() - 1).getUrl());
             entity.setOwnerId(note.getUser().getUserId());
             entity.setOwnerAvatar(note.getUser().getAvatar());
             entity.setOwnerNickname(note.getUser().getNickname());
@@ -108,7 +108,7 @@ public class RedBookLikeService {
     }
 
     public void downloadExcel(RedBookCollectExportExcelVo vo, HttpServletResponse response) {
-        String[] titles = new String[]{"标题", "笔记链接","笔记内容", "作者", "封面地址", "点赞数"};
+        String[] titles = new String[]{"标题", "笔记链接", "笔记内容", "作者", "封面地址", "点赞数"};
         List<RedBookLikeDto> notes = redBookLikeMapper.queryByUserId(vo.getUserId(), vo.getDisplayTitle(), vo.getOwnerNickname());
         //创建Excel文档
         XSSFWorkbook workbook = new XSSFWorkbook();
@@ -154,7 +154,8 @@ public class RedBookLikeService {
             cell0.setCellValue(note.getDisplayTitle());
 
             XSSFCell cell1 = row.createCell(1);
-            String noteAddress = "https://www.xiaohongshu.com/explore/" + note.getNoteId();
+            // https://www.xiaohongshu.com/explore/6857d470000000000b01d330?xsec_token=ABjkBbxIaf9xNTNc1e1QGlKITURpBbNrODU9sSk-pGr9A=&xsec_source=pc_like
+            String noteAddress = "https://www.xiaohongshu.com/explore/" + note.getNoteId() + "?xsec_token=" + note.getXsecToken() + "&xsec_source=pc_like";
             Hyperlink noteLink = createHelper.createHyperlink(HyperlinkType.URL);
             noteLink.setAddress(noteAddress);
             cell1.setHyperlink(noteLink);
@@ -236,7 +237,7 @@ public class RedBookLikeService {
         IoUtil.close(outputStream);
     }
 
-    
+
     public void deleteByUserId(String userId) {
         if (StringUtils.isEmpty(userId)) {
             throw new RuntimeException("userId不能为空");

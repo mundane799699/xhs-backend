@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class RedBookLikeDto {
     private String userId;
     private String noteId;
+    private String xsecToken;
     private String displayTitle;
     private String type;
     private String coverUrl;
@@ -17,7 +18,7 @@ public class RedBookLikeDto {
     private String ownerNickname;
     private String ownerAvatar;
     private Boolean liked;
-    private Integer likedCount;
+    private String likedCount;
 
     private String tagList;
     private String detailId;

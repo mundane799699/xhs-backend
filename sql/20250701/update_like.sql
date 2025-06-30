@@ -1,0 +1,2 @@
+ALTER TABLE `tb_redbook_like`
+MODIFY COLUMN `liked_count` VARCHAR(255) DEFAULT NULL COMMENT '点赞数';

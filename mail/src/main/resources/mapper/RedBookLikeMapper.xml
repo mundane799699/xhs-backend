@@ -8,6 +8,7 @@
         insert into tb_redbook_like(
         user_id,
         note_id,
+        xsec_token,
         display_title,
         `type`,
         cover_url,
@@ -24,6 +25,7 @@
             (
             #{item.userId},
             #{item.noteId},
+            #{item.xsecToken},
             #{item.displayTitle},
             #{item.type},
             #{item.coverUrl},
@@ -39,6 +41,7 @@
         </foreach>
         ON DUPLICATE KEY UPDATE
         display_title=VALUES(display_title),
+        xsec_token=VALUES(xsec_token),
         cover_url=VALUES(cover_url),
         owner_nickname=VALUES(owner_nickname),
         owner_avatar=VALUES(owner_avatar),
@@ -51,6 +54,7 @@
         select
             tl.user_id,
             tl.note_id,
+            tl.xsec_token,
             tl.display_title,
             tl.type,
             tl.cover_url,
