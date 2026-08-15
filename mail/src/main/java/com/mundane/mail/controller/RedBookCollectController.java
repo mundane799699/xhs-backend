@@ -34,7 +34,8 @@ public class RedBookCollectController {
         }
     }
 
-    @PostMapping(value = "/exportexcel", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    // 已废弃：前端已改为本地导出，避免大数据量导出耗尽 JVM 堆。
+    // @PostMapping(value = "/exportexcel", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public void downloadExcel(@RequestBody RedBookCollectExportExcelVo vo, HttpServletResponse response) {
         try {
             collectService.downloadExcel(vo, response);
@@ -43,7 +44,8 @@ public class RedBookCollectController {
         }
     }
 
-    @PostMapping("/exportHtml")
+    // 已废弃：前端已改为本地导出。
+    // @PostMapping("/exportHtml")
     public void downloadHtml(@RequestBody RedBookCollectExportHtmlVo vo, HttpServletResponse response) {
         try {
             collectService.downloadHtml(vo, response);
