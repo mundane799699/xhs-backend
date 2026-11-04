@@ -45,9 +45,6 @@ public class OrderService {
     private RedBookItemMapper itemMapper;
 
     @Autowired
-    private ScheduleService scheduleService;
-
-    @Autowired
     private RedArchiveUserMapper userMapper;
 
     @Transactional(rollbackFor = Exception.class)
@@ -78,7 +75,6 @@ public class OrderService {
         String outTradeNo = result.get("out_trade_no");
         String orderNo = result.get("order_no");
         String payNo = result.get("pay_no");
-        String totalFee = result.get("total_fee");
         RedBookOrderEntity order = orderMapper.selectByPrimaryKey(outTradeNo);
         if (order == null) {
             throw new RuntimeException("订单不存在");
@@ -111,11 +107,6 @@ public class OrderService {
         }
         userMapper.updateByPrimaryKey(user);
         orderMapper.updateByPrimaryKey(order);
-        try {
-            scheduleService.sendPaySuccess(totalFee);
-        } catch (Exception e) {
-            log.error("发送支付成功邮件失败", e);
-        }
     }
 
     public QueryOrderStatusRespVo queryOrderStatus(String outTradeNo) {
