@@ -62,3 +62,6 @@ application-*.properties
 
 # User-defined folders
 images/
+
+# 生产数据库连接（本地使用，勿提交）
+.db-prod.cnf
