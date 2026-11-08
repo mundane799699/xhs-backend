@@ -93,7 +93,7 @@ public class OrderService {
             throw new RuntimeException("用户不存在");
         }
         user.setUpdateTime(now);
-        if (item.getMembershipType() == CommonConstants.LIFE_TIME) {
+        if (CommonConstants.LIFE_TIME.equals(item.getMembershipType())) {
             user.setMembershipType(CommonConstants.LIFE_TIME);
             user.setMembershipExpiry(null);
         } else {
@@ -147,7 +147,7 @@ public class OrderService {
         // 修改用户表
         RedBookItemEntity item = itemMapper.selectByPrimaryKey(order.getItemType());
         user.setUpdateTime(now);
-        if (item.getMembershipType() == CommonConstants.LIFE_TIME) {
+        if (CommonConstants.LIFE_TIME.equals(item.getMembershipType())) {
             user.setMembershipType(CommonConstants.LIFE_TIME);
             user.setMembershipExpiry(null);
         } else {
