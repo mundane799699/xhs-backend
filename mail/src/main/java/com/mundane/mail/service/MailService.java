@@ -36,6 +36,15 @@ public class MailService {
         }
     }
 
+    public void sendResetPasswordCode(String email, String code, long expireMinutes) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("mundane799699@163.com");
+        message.setTo(email);
+        message.setSubject("RedArchive 重置密码验证码");
+        message.setText(String.format("您正在重置密码，验证码为：%s\n验证码%d分钟内有效，请勿泄露给他人。\n如果这不是您本人的操作，请忽略此邮件。", code, expireMinutes));
+        mailSender.send(message);
+    }
+
     public void reportPictureUpdated() {
         SimpleMailMessage message = new SimpleMailMessage();
         // 谁发的

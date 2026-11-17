@@ -11,13 +11,18 @@ import com.mundane.mail.mapper.RedBookClientMapper;
 import com.mundane.mail.vo.LoginRequest;
 import com.mundane.mail.dto.UserInfo;
 import com.mundane.mail.vo.RegisterRequest;
+import com.mundane.mail.vo.ResetPasswordRequest;
+import com.mundane.mail.vo.SendResetCodeRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -28,6 +33,20 @@ public class AuthService {
 
     @Autowired
     private RedBookClientMapper clientMapper;
+
+    @Autowired
+    private MailService mailService;
+
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
+    private static final String RESET_CODE_KEY = "reset_pwd:code:";
+    private static final String RESET_LIMIT_KEY = "reset_pwd:limit:";
+    private static final String RESET_ATTEMPT_KEY = "reset_pwd:attempt:";
+    private static final long RESET_CODE_EXPIRE_MINUTES = 10;
+    private static final long RESET_SEND_INTERVAL_SECONDS = 60;
+    private static final int RESET_MAX_ATTEMPTS = 5;
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     @Transactional(rollbackFor = Exception.class)
     public void register(RegisterRequest vo) {
@@ -98,6 +117,70 @@ public class AuthService {
             return;
         }
         StpUtil.logout();
+    }
+
+    public void sendResetCode(SendResetCodeRequest vo) {
+        String email = StringUtils.trim(vo.getEmail());
+        if (StringUtils.isEmpty(email)) {
+            throw new IllegalArgumentException("邮箱不能为空");
+        }
+        RedArchiveUser user = userMapper.findByEmail(email);
+        if (user == null) {
+            throw new IllegalArgumentException("该邮箱未注册");
+        }
+        // 60 秒内只能发送一次
+        Boolean allowed = redisTemplate.opsForValue()
+                .setIfAbsent(RESET_LIMIT_KEY + email, "1", RESET_SEND_INTERVAL_SECONDS, TimeUnit.SECONDS);
+        if (!Boolean.TRUE.equals(allowed)) {
+            throw new IllegalArgumentException("验证码发送过于频繁，请稍后再试");
+        }
+        String code = String.format("%06d", RANDOM.nextInt(1000000));
+        try {
+            mailService.sendResetPasswordCode(email, code, RESET_CODE_EXPIRE_MINUTES);
+        } catch (Exception e) {
+            redisTemplate.delete(RESET_LIMIT_KEY + email);
+            log.error("发送重置密码验证码失败, email = {}", email, e);
+            throw new IllegalStateException("验证码邮件发送失败，请稍后再试");
+        }
+        redisTemplate.opsForValue().set(RESET_CODE_KEY + email, code, RESET_CODE_EXPIRE_MINUTES, TimeUnit.MINUTES);
+        redisTemplate.delete(RESET_ATTEMPT_KEY + email);
+    }
+
+    public void resetPassword(ResetPasswordRequest vo) {
+        String email = StringUtils.trim(vo.getEmail());
+        if (StringUtils.isAnyEmpty(email, vo.getCode(), vo.getNewPassword())) {
+            throw new IllegalArgumentException("邮箱、验证码和新密码不能为空");
+        }
+        String codeKey = RESET_CODE_KEY + email;
+        String attemptKey = RESET_ATTEMPT_KEY + email;
+        String savedCode = redisTemplate.opsForValue().get(codeKey);
+        if (savedCode == null) {
+            throw new IllegalArgumentException("验证码已失效，请重新获取");
+        }
+        if (!savedCode.equals(StringUtils.trim(vo.getCode()))) {
+            // 错误次数过多则作废验证码，防止暴力破解
+            Long attempts = redisTemplate.opsForValue().increment(attemptKey);
+            redisTemplate.expire(attemptKey, RESET_CODE_EXPIRE_MINUTES, TimeUnit.MINUTES);
+            if (attempts != null && attempts >= RESET_MAX_ATTEMPTS) {
+                redisTemplate.delete(codeKey);
+                redisTemplate.delete(attemptKey);
+                throw new IllegalArgumentException("验证码错误次数过多，请重新获取");
+            }
+            throw new IllegalArgumentException("验证码错误");
+        }
+        RedArchiveUser user = userMapper.findByEmail(email);
+        if (user == null) {
+            throw new IllegalArgumentException("该邮箱未注册");
+        }
+        RedArchiveUser update = new RedArchiveUser();
+        update.setUserId(user.getUserId());
+        update.setPassword(BCrypt.hashpw(vo.getNewPassword()));
+        update.setUpdateTime(LocalDateTime.now());
+        userMapper.updateByPrimaryKeySelective(update);
+        redisTemplate.delete(codeKey);
+        redisTemplate.delete(attemptKey);
+        // 密码重置后，让该账号已登录的设备全部下线
+        StpUtil.logout(user.getUserId());
     }
 
     public UserInfo getUserInfo() {

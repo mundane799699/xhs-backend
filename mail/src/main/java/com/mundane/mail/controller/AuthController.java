@@ -5,6 +5,8 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.mundane.mail.vo.LoginRequest;
 import com.mundane.mail.dto.UserInfo;
 import com.mundane.mail.vo.RegisterRequest;
+import com.mundane.mail.vo.ResetPasswordRequest;
+import com.mundane.mail.vo.SendResetCodeRequest;
 import com.mundane.mail.pojo.Response;
 import com.mundane.mail.service.AuthService;
 import com.mundane.mail.vo.UserInfoRespVo;
@@ -41,6 +43,18 @@ public class AuthController {
     @PostMapping("/register")
     public Response register(@RequestBody RegisterRequest vo) {
         authService.register(vo);
+        return Response.success();
+    }
+
+    @PostMapping("/sendResetCode")
+    public Response sendResetCode(@RequestBody SendResetCodeRequest vo) {
+        authService.sendResetCode(vo);
+        return Response.success();
+    }
+
+    @PostMapping("/resetPassword")
+    public Response resetPassword(@RequestBody ResetPasswordRequest vo) {
+        authService.resetPassword(vo);
         return Response.success();
     }
 
